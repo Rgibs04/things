@@ -148,7 +148,7 @@ echo ""
 
 bash "$INSTALLER"
 
-# Cleanup
+# Cleanup temporary files
 echo ""
 echo -e "${BLUE}Cleaning up temporary files...${NC}"
 cd /
