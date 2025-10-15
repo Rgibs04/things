@@ -212,7 +212,12 @@ EOF
         echo -e "${GREEN}  ✓ Configuration created${NC}"
         
         echo -e "${BLUE}  Building and starting application...${NC}"
-        docker-compose up -d --build
+        # Use docker compose (plugin) or docker-compose (standalone)
+        if command -v docker-compose &> /dev/null; then
+            docker-compose up -d --build
+        else
+            docker compose up -d --build
+        fi
         
         sleep 10
         
@@ -220,7 +225,11 @@ EOF
             echo -e "${GREEN}  ✓ Application is running${NC}"
         else
             echo -e "${RED}  ✗ Application failed to start${NC}"
-            docker-compose logs
+            if command -v docker-compose &> /dev/null; then
+                docker-compose logs
+            else
+                docker compose logs
+            fi
             exit 1
         fi
         
@@ -230,12 +239,19 @@ EOF
 APP_DIR="/opt/classdojo"
 cd ${APP_DIR}
 
+# Detect docker-compose command
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD="docker-compose"
+else
+    COMPOSE_CMD="docker compose"
+fi
+
 case "$1" in
-    start) docker-compose up -d ;;
-    stop) docker-compose down ;;
-    restart) docker-compose restart ;;
-    logs) docker-compose logs -f ;;
-    status) docker-compose ps ;;
+    start) ${COMPOSE_CMD} up -d ;;
+    stop) ${COMPOSE_CMD} down ;;
+    restart) ${COMPOSE_CMD} restart ;;
+    logs) ${COMPOSE_CMD} logs -f ;;
+    status) ${COMPOSE_CMD} ps ;;
     backup)
         BACKUP_FILE="${HOME}/classdojo-backup-$(date +%Y%m%d-%H%M%S).db"
         docker cp classdojo-debit-system:/app/database/school_debit.db "${BACKUP_FILE}"
@@ -254,7 +270,15 @@ MANAGE_EOF
         chmod +x /usr/local/bin/classdojo-manage
         
         # Create systemd service for Docker Compose auto-start
-        cat > /etc/systemd/system/classdojo-docker.service <<'SERVICE_EOF'
+        # Detect which docker-compose command to use
+        if command -v docker-compose &> /dev/null; then
+            COMPOSE_EXEC="/usr/bin/docker-compose"
+        else
+            COMPOSE_EXEC="/usr/bin/docker"
+            COMPOSE_ARGS="compose"
+        fi
+        
+        cat > /etc/systemd/system/classdojo-docker.service <<SERVICE_EOF
 [Unit]
 Description=ClassDojo Debit System (Docker Compose)
 Requires=docker.service
@@ -265,8 +289,8 @@ Wants=network-online.target
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/classdojo
-ExecStart=/usr/bin/docker-compose -f /opt/classdojo/docker-compose.yml up -d
-ExecStop=/usr/bin/docker-compose -f /opt/classdojo/docker-compose.yml down
+ExecStart=${COMPOSE_EXEC} ${COMPOSE_ARGS} -f /opt/classdojo/docker-compose.yml up -d
+ExecStop=${COMPOSE_EXEC} ${COMPOSE_ARGS} -f /opt/classdojo/docker-compose.yml down
 TimeoutStartSec=0
 
 [Install]
