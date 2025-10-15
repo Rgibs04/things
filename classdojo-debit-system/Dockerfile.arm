@@ -24,7 +24,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY src/ ./src/
 COPY templates/ ./templates/
-COPY static/ ./static/
+
+# Copy static directory (create if doesn't exist)
+COPY static ./static/
+RUN mkdir -p /app/static
 
 # Create database directory
 RUN mkdir -p /app/database
