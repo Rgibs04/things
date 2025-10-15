@@ -149,12 +149,12 @@ echo ""
 bash "$INSTALLER"
 
 # Cleanup temporary files
-echo ""
-echo -e "${BLUE}Cleaning up temporary files...${NC}"
-cd /
-rm -rf "$TEMP_DIR"
-echo -e "${GREEN}✓ Cleanup complete${NC}"
-echo ""
+#echo ""
+#echo -e "${BLUE}Cleaning up temporary files...${NC}"
+#cd /
+#rm -rf "$TEMP_DIR"
+#echo -e "${GREEN}✓ Cleanup complete${NC}"
+#echo ""
 
 echo -e "${GREEN}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║                                                           ║${NC}"
