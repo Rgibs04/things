@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ClassDojo Debit System{% endblock %}
+
+{% block content %}
+<h1>📊 Dashboard</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ total_students }}</h3>
+        <p>Total Students</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_points }}</h3>
+        <p>Total Points in Circulation</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ (total_points / total_students)|round(0)|int if total_students > 0 else 0 }}</h3>
+        <p>Average Balance</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Quick Actions</h2>
+    <p style="margin-bottom: 20px;">Get started with common tasks:</p>
+    
+    <a href="{{ url_for('add_student') }}" class="btn">➕ Add New Student</a>
+    <a href="{{ url_for('transaction') }}" class="btn">💳 Process Transaction</a>
+    <a href="{{ url_for('import_csv') }}" class="btn">📥 Import from ClassDojo</a>
+    <a href="{{ url_for('students') }}" class="btn btn-secondary">👥 View All Students</a>
+</div>
+
+<div class="card">
+    <h2>About This System</h2>
+    <p>This debit card system allows students to use their ClassDojo points as currency within the school. Students can:</p>
+    <ul style="margin-top: 15px; margin-left: 20px; line-height: 1.8;">
+        <li>Earn points through positive behavior and achievements</li>
+        <li>Use physical debit cards linked to their accounts</li>
+        <li>Make purchases at the school store, cafeteria, and other locations</li>
+        <li>Track their spending and balance history</li>
+    </ul>
+    
+    <h3 style="margin-top: 25px; color: #667eea;">Getting Started:</h3>
+    <ol style="margin-top: 15px; margin-left: 20px; line-height: 1.8;">
+        <li>Import student data from ClassDojo (CSV export)</li>
+        <li>Assign physical card IDs to each student</li>
+        <li>Start processing transactions at various school locations</li>
+        <li>Monitor balances and transaction history</li>
+    </ol>
+</div>
+{% endblock %}

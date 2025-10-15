@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Card - ClassDojo Debit System{% endblock %}
+
+{% block content %}
+<h1>🎴 Assign Card to Student</h1>
+
+<div class="card">
+    <h2>Card Assignment</h2>
+    
+    <form method="POST" action="{{ url_for('assign_card') }}">
+        <div class="form-group">
+            <label for="student_id">Select Student *</label>
+            <select id="student_id" name="student_id" required>
+                <option value="">-- Choose a student --</option>
+                {% for student in students %}
+                    <option value="{{ student[1] }}">
+                        {{ student[2] }} {{ student[3] }} ({{ student[1] }})
+                        {% if student[5] %} - Already has card: {{ student[5] }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="card_id">Card ID *</label>
+            <input type="text" id="card_id" name="card_id" required 
+                   placeholder="Scan card or enter card ID">
+            <small style="color: #6c757d;">Scan the physical card or enter the card ID manually</small>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn">Assign Card</button>
+            <a href="{{ url_for('students') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📋 Students Without Cards</h2>
+    
+    {% set students_without_cards = students|selectattr('5', 'none')|list %}
+    
+    {% if students_without_cards %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students_without_cards %}
+                <tr>
+                    <td>{{ student[1] }}</td>
+                    <td>{{ student[2] }} {{ student[3] }}</td>
+                    <td>{{ student[4] if student[4] else 'N/A' }}</td>
+                    <td>{{ student[6] }} points</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; padding: 40px; color: #6c757d;">
+            ✓ All students have cards assigned!
+        </p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>💡 Tips</h2>
+    <ul style="line-height: 1.8; margin-left: 20px;">
+        <li>Each card ID must be unique</li>
+        <li>Use a card reader to scan physical cards for accurate IDs</li>
+        <li>Card IDs can be barcodes, RFID numbers, or any unique identifier</li>
+        <li>Students can only have one active card at a time</li>
+        <li>If reassigning a card, the old assignment will be deactivated</li>
+    </ul>
+</div>
+{% endblock %}

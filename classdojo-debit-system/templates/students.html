@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Students - ClassDojo Debit System{% endblock %}
+
+{% block content %}
+<h1>👥 All Students</h1>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Student Directory</h2>
+        <a href="{{ url_for('add_student') }}" class="btn">➕ Add New Student</a>
+    </div>
+    
+    {% if students %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Card ID</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student[1] }}</td>
+                    <td>{{ student[2] }} {{ student[3] }}</td>
+                    <td>{{ student[4] if student[4] else 'N/A' }}</td>
+                    <td>{{ student[5] if student[5] else 'No card assigned' }}</td>
+                    <td style="font-weight: bold; color: {% if student[6] > 0 %}#28a745{% else %}#dc3545{% endif %};">
+                        {{ student[6] }} points
+                    </td>
+                    <td>
+                        <a href="{{ url_for('student_detail', student_id=student[1]) }}" 
+                           style="color: #667eea; text-decoration: none; font-weight: 600;">
+                            View Details →
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; padding: 40px; color: #6c757d;">
+            No students found. <a href="{{ url_for('add_student') }}" style="color: #667eea;">Add your first student</a> 
+            or <a href="{{ url_for('import_csv') }}" style="color: #667eea;">import from ClassDojo</a>.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

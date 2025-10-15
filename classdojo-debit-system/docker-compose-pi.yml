@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  classdojo-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.arm
+    image: classdojo-debit-system:latest
+    container_name: classdojo-debit-system
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change-this-to-a-secure-random-key}
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Persistent database storage
+      - ./database:/app/database
+      # Mount source code for easy updates (optional, comment out for production)
+      - ./src:/app/src:ro
+      - ./templates:/app/templates:ro
+      - ./static:/app/static:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health').read()"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          # Limit memory to prevent OOM on Raspberry Pi 3B
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - classdojo-network
+
+networks:
+  classdojo-network:
+    driver: bridge
+
+# Optional: Add a backup service that runs daily
+# Uncomment to enable automated backups
+#  backup:
+#    image: arm32v7/alpine:latest
+#    container_name: classdojo-backup
+#    volumes:
+#      - ./database:/data:ro
+#      - ./backups:/backups
+#    command: >
+#      sh -c "while true; do
+#        cp /data/school_debit.db /backups/backup-$$(date +%Y%m%d-%H%M%S).db;
+#        find /backups -name 'backup-*.db' -mtime +7 -delete;
+#        sleep 86400;
+#      done"
+#    restart: unless-stopped
+#    networks:
+#      - classdojo-network

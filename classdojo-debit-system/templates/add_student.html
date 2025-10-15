@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Add Student - ClassDojo Debit System{% endblock %}
+
+{% block content %}
+<h1>➕ Add New Student</h1>
+
+<div class="card">
+    <h2>Student Information</h2>
+    
+    <form method="POST" action="{{ url_for('add_student') }}">
+        <div class="form-group">
+            <label for="student_id">Student ID *</label>
+            <input type="text" id="student_id" name="student_id" required 
+                   placeholder="e.g., S12345">
+        </div>
+        
+        <div class="form-group">
+            <label for="first_name">First Name *</label>
+            <input type="text" id="first_name" name="first_name" required 
+                   placeholder="e.g., John">
+        </div>
+        
+        <div class="form-group">
+            <label for="last_name">Last Name *</label>
+            <input type="text" id="last_name" name="last_name" required 
+                   placeholder="e.g., Smith">
+        </div>
+        
+        <div class="form-group">
+            <label for="class_name">Class Name</label>
+            <input type="text" id="class_name" name="class_name" 
+                   placeholder="e.g., Grade 5A">
+        </div>
+        
+        <div class="form-group">
+            <label for="card_id">Card ID (Optional - can assign later)</label>
+            <input type="text" id="card_id" name="card_id" 
+                   placeholder="e.g., CARD001 or scan card">
+        </div>
+        
+        <div class="form-group">
+            <label for="initial_balance">Initial Balance (Points)</label>
+            <input type="number" id="initial_balance" name="initial_balance" 
+                   value="0" min="0" placeholder="0">
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn">Add Student</button>
+            <a href="{{ url_for('students') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>💡 Tips</h2>
+    <ul style="line-height: 1.8; margin-left: 20px;">
+        <li>Student ID should be unique for each student</li>
+        <li>Card ID can be assigned now or later using the "Assign Card" feature</li>
+        <li>Initial balance is typically 0, but you can set a starting amount</li>
+        <li>You can also import multiple students at once using CSV import</li>
+    </ul>
+</div>
+{% endblock %}

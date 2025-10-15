@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: classdojo-ingress
+  namespace: classdojo-system
+  labels:
+    app: classdojo-debit-system
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Uncomment for SSL/TLS
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: classdojo.local  # Change this to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: classdojo-service
+            port:
+              number: 80
+  # Uncomment for SSL/TLS
+  # tls:
+  # - hosts:
+  #   - classdojo.local
+  #   secretName: classdojo-tls

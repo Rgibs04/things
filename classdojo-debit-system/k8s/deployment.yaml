@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: classdojo-debit-system
+  namespace: classdojo-system
+  labels:
+    app: classdojo-debit-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: classdojo-debit-system
+  template:
+    metadata:
+      labels:
+        app: classdojo-debit-system
+    spec:
+      containers:
+      - name: classdojo-app
+        image: classdojo-debit-system:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+          name: http
+          protocol: TCP
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: classdojo-config
+              key: FLASK_ENV
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: classdojo-secret
+              key: SECRET_KEY
+        volumeMounts:
+        - name: database-storage
+          mountPath: /app/database
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: database-storage
+        persistentVolumeClaim:
+          claimName: classdojo-pvc
