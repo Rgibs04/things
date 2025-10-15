@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ClassDojo Debit System - One-Liner Installer for Raspberry Pi 3B
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install.sh | sudo bash
-# Or: wget -qO- https://raw.githubusercontent.com/YOUR_REPO/main/install.sh | sudo bash
+# Usage: curl -sSL https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/install.sh | sudo bash
+# Or: wget -qO- https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/install.sh | sudo bash
 
 set -e
 
@@ -15,7 +15,8 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-REPO_URL="https://github.com/YOUR_USERNAME/classdojo-debit-system.git"
+REPO_URL="https://github.com/Rgibs04/things.git"
+REPO_SUBDIR="classdojo-debit-system"
 INSTALL_DIR="/opt/classdojo"
 TEMP_DIR="/tmp/classdojo-install"
 
@@ -86,7 +87,7 @@ fi
 echo -e "${GREEN}✓ Disk space check passed${NC}"
 
 # Check architecture (ARM)
-if [[ ! "$ARCH" =~ ^(armv7l|aarch64)$ ]]; then
+if [[ ! "$ARCH" =~ ^(armv7l|aarch64|x86_64)$ ]]; then
     echo -e "${YELLOW}⚠ Warning: Architecture ${ARCH} may not be fully supported${NC}"
     echo -e "${YELLOW}  This installer is optimized for ARM (Raspberry Pi)${NC}"
     read -p "Continue anyway? (y/N) " -n 1 -r
@@ -147,23 +148,19 @@ fi
 # Download the project
 echo -e "${BLUE}Downloading ClassDojo Debit System...${NC}"
 
-# Try to clone from git, or use local files if available
-if [ -n "$REPO_URL" ] && [[ "$REPO_URL" != *"YOUR_USERNAME"* ]]; then
-    git clone "$REPO_URL" "$TEMP_DIR/classdojo-debit-system"
-    cd "$TEMP_DIR/classdojo-debit-system"
-else
-    # If running from local directory, copy files
-    if [ -f "/tmp/raspberry-pi-setup.sh" ] || [ -f "./raspberry-pi-setup.sh" ]; then
-        echo -e "${YELLOW}Using local installation files...${NC}"
-        # Files are already in current directory or will be provided
+# Clone the repository
+if [ -n "$REPO_URL" ]; then
+    git clone "$REPO_URL" "$TEMP_DIR/things"
+    if [ -d "$TEMP_DIR/things/$REPO_SUBDIR" ]; then
+        cd "$TEMP_DIR/things/$REPO_SUBDIR"
+        echo -e "${GREEN}✓ Repository downloaded${NC}"
     else
-        echo -e "${RED}Error: Repository URL not configured and no local files found${NC}"
-        echo -e "${YELLOW}Please either:${NC}"
-        echo -e "  1. Update REPO_URL in this script with your repository"
-        echo -e "  2. Run this script from the project directory"
-        echo -e "  3. Download the project manually to ${INSTALL_DIR}"
+        echo -e "${RED}Error: Could not find $REPO_SUBDIR in repository${NC}"
         exit 1
     fi
+else
+    echo -e "${RED}Error: Repository URL not configured${NC}"
+    exit 1
 fi
 
 # Run the appropriate installation method
