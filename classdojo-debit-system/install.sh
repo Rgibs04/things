@@ -343,11 +343,12 @@ INSTALLER_EOF
         ;;
 esac
 
-# Cleanup
+# Cleanup temporary files
 echo ""
 echo -e "${BLUE}Cleaning up temporary files...${NC}"
 cd /
 rm -rf "$TEMP_DIR"
+echo -e "${GREEN}✓ Cleanup complete${NC}"
 
 # Final message
 echo ""
