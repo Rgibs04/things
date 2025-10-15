@@ -87,11 +87,13 @@ echo -e "${YELLOW}Repository: ${REPO_URL}${NC}"
 echo -e "${YELLOW}Branch: ${REPO_BRANCH}${NC}"
 echo ""
 
-if git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" repo 2>&1 | grep -v "Cloning into"; then
+if git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" repo; then
     echo -e "${GREEN}✓ Repository downloaded successfully${NC}"
 else
     echo -e "${RED}✗ Failed to download repository${NC}"
-    echo -e "${RED}Please check your internet connection and try again${NC}"
+    echo -e "${RED}Error details:${NC}"
+    git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" repo 2>&1 || true
+    echo -e "${RED}Please check your internet connection and repository access${NC}"
     rm -rf "$TEMP_DIR"
     exit 1
 fi
