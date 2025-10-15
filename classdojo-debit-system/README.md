@@ -12,8 +12,49 @@ A comprehensive debit card management system that integrates with ClassDojo poin
 - 📥 **CSV Import** - Bulk import students from ClassDojo exports
 - 🌐 **Web Interface** - Easy-to-use admin dashboard
 - 🔌 **API Endpoints** - RESTful API for card readers and POS systems
+- 🔄 **Auto-Start** - Automatically starts on system boot
+- 💾 **Easy Backups** - Simple database backup and restore
 
-## Installation
+---
+
+## 🚀 Quick Installation from GitHub
+
+### One-Line Installation (Recommended):
+```bash
+curl -sSL https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/bootstrap.sh | sudo bash
+```
+
+**This will:**
+- ✅ Download the entire project from GitHub
+- ✅ Install all dependencies automatically
+- ✅ Configure autostart on boot
+- ✅ Set up the application (15-30 minutes)
+
+**See [GITHUB-INSTALL.md](GITHUB-INSTALL.md) for complete GitHub installation guide.**
+
+---
+
+## 📦 Installation Methods
+
+### Method 1: From GitHub (Easiest)
+```bash
+# One-line installation
+curl -sSL https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/bootstrap.sh | sudo bash
+```
+
+### Method 2: Clone and Install
+```bash
+# Clone repository
+git clone https://github.com/Rgibs04/things.git
+cd things/classdojo-debit-system
+
+# Run installer for your system
+sudo bash ubuntu-install.sh          # For Ubuntu/Debian
+sudo bash raspberry-pi-setup.sh      # For Raspberry Pi
+sudo bash install.sh                 # Generic installer
+```
+
+### Method 3: Manual Installation (Local Files)
 
 ### 🚀 Quick Install for Raspberry Pi 3B (Recommended)
 
@@ -96,6 +137,37 @@ sudo bash standalone-install.sh
 
 4. **Access the web interface:**
    Open your browser and go to: `http://localhost:5000`
+
+---
+
+## 🎮 Managing Your Installation
+
+### Docker Compose (Recommended):
+```bash
+classdojo-manage start      # Start application
+classdojo-manage stop       # Stop application
+classdojo-manage restart    # Restart application
+classdojo-manage logs       # View logs
+classdojo-manage status     # Check status
+classdojo-manage backup     # Backup database
+classdojo-manage access     # Show access URLs
+```
+
+### Standalone Python:
+```bash
+sudo systemctl start classdojo
+sudo systemctl stop classdojo
+sudo systemctl restart classdojo
+sudo systemctl status classdojo
+sudo journalctl -u classdojo -f  # View logs
+```
+
+### K3s (Kubernetes):
+```bash
+sudo k3s kubectl get pods -n classdojo-system
+sudo k3s kubectl logs -n classdojo-system -l app=classdojo-debit-system -f
+sudo k3s kubectl rollout restart deployment/classdojo-debit-system -n classdojo-system
+```
 
 ---
 
