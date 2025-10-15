@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # ClassDojo Debit System - One-Liner Installer for Raspberry Pi 3B
 # Usage: curl -sSL https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/install.sh | sudo bash
 # Or: wget -qO- https://raw.githubusercontent.com/Rgibs04/things/master/classdojo-debit-system/install.sh | sudo bash
