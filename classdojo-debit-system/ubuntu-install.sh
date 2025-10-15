@@ -253,6 +253,31 @@ esac
 MANAGE_EOF
         chmod +x /usr/local/bin/classdojo-manage
         
+        # Create systemd service for Docker Compose auto-start
+        cat > /etc/systemd/system/classdojo-docker.service <<'SERVICE_EOF'
+[Unit]
+Description=ClassDojo Debit System (Docker Compose)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/classdojo
+ExecStart=/usr/bin/docker-compose -f /opt/classdojo/docker-compose.yml up -d
+ExecStop=/usr/bin/docker-compose -f /opt/classdojo/docker-compose.yml down
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+SERVICE_EOF
+        
+        # Enable the service for auto-start
+        systemctl daemon-reload
+        systemctl enable classdojo-docker.service > /dev/null 2>&1
+        echo -e "${GREEN}  ✓ Auto-start configured${NC}"
+        
         MGMT_CMD="classdojo-manage"
         ;;
         
@@ -377,6 +402,9 @@ echo ""
 echo -e "${CYAN}Access Information:${NC}"
 echo -e "  Local: ${GREEN}http://localhost:5000${NC}"
 echo -e "  Network: ${GREEN}http://${IP_ADDR}:5000${NC}"
+echo ""
+echo -e "${CYAN}Auto-Start:${NC}"
+echo -e "  ✅ Application will ${GREEN}automatically start on system boot${NC}"
 echo ""
 
 case $INSTALL_METHOD in
