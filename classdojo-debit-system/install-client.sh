@@ -119,20 +119,17 @@ if [[ $REPLY =~ ^[Nn]$ ]]; then
     exit 0
 fi
 
-# Create temporary directory
 echo ""
 echo -e "${BLUE}Setting up installation environment...${NC}"
 mkdir -p "$TEMP_DIR"
 cd "$TEMP_DIR"
 
-# Check if git is installed
 if ! command -v git &> /dev/null; then
     echo -e "${YELLOW}Installing git...${NC}"
     apt-get update -qq
     apt-get install -y git
 fi
 
-# Download the project
 echo -e "${BLUE}Downloading ClassDojo Debit System...${NC}"
 
 # Clone the repository
