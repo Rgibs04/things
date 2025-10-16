@@ -25,7 +25,7 @@ A comprehensive debit card management system with server-client architecture, fr
 
 ```bash
 # One-line installation
-curl -sSL https://raw.githubusercontent.com/yourusername/classdojo-debit-system/main/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Rgibs04/classdojo-debit-system/main/install.sh | sudo bash
 
 # Or manual setup
 cd classdojo-debit-system

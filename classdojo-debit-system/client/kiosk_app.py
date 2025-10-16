@@ -16,7 +16,7 @@ import json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+    from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QInputDialog, QLineEdit,
                                  QHBoxLayout, QLabel, QPushButton, QLineEdit,
                                  QTextEdit, QFrame, QGridLayout, QMessageBox,
                                  QProgressBar, QSystemTrayIcon, QMenu, QAction)

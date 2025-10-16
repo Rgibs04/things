@@ -5,19 +5,19 @@
 ### Step 1: Install Server (Central Database)
 On your server machine (Raspberry Pi 3B+ or Ubuntu server):
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install-server.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Rgibs04/classdojo-debit-system/main/install-server.sh | sudo bash
 ```
 
 ### Step 2: Install Clients (POS Terminals)
 On each kiosk/touchscreen device:
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install-client.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Rgibs04/classdojo-debit-system/main/install-client.sh | sudo bash
 ```
 
 ### Alternative: Universal Installer (Both on Same Machine)
 For testing or single-machine setup:
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Rgibs04/classdojo-debit-system/main/install.sh | sudo bash
 ```
 
 ---

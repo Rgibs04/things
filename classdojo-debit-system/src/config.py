@@ -8,9 +8,9 @@ class Config:
     DATABASE_PATH = os.environ.get('DATABASE_PATH', 'database/school_debit.db')
 
     # Email monitoring
-    EMAIL_IMAP_SERVER = os.environ.get('EMAIL_IMAP_SERVER', 'imap.gmail.com')
-    EMAIL_USER = os.environ.get('EMAIL_USER')
-    EMAIL_PASS = os.environ.get('EMAIL_PASS')
+    EMAIL_IMAP_SERVER = os.environ.get('EMAIL_IMAP_SERVER', 'imap.ionos.co.uk')
+    EMAIL_USER = os.environ.get('testing@harleycloud.com')
+    EMAIL_PASS = os.environ.get('Testing.!2222!.')
     EMAIL_CHECK_INTERVAL = int(os.environ.get('EMAIL_CHECK_INTERVAL', '300'))
 
     # Kiosk settings

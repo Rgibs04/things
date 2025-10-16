@@ -2,7 +2,7 @@
 
 # ClassDojo Debit System - Server Installer
 # Installs the server component (web interface and database)
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install-server.sh | sudo bash
+# Usage: curl -sSL https://raw.githubusercontent.com/things/master/install-server.sh | sudo bash
 
 set -e
 

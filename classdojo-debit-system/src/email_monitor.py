@@ -8,15 +8,16 @@ from database_enhanced import DebitCardDatabase
 class EmailMonitor:
     def __init__(self, db_path='database/school_debit.db'):
         self.db = DebitCardDatabase(db_path)
-        self.imap_server = os.environ.get('EMAIL_IMAP_SERVER', 'imap.gmail.com')
-        self.email_user = os.environ.get('EMAIL_USER')
-        self.email_pass = os.environ.get('EMAIL_PASS')
+        self.imap_server = os.environ.get('EMAIL_IMAP_SERVER', 'imap.ionos.co.uk')
+        self.email_user = os.environ.get('EMAIL_USER', 'testing@harleycloud.com')
+        self.email_pass = os.environ.get('EMAIL_PASS', 'Testing.!2222!.')
         self.check_interval = int(os.environ.get('EMAIL_CHECK_INTERVAL', '300'))  # 5 minutes default
 
     def connect_imap(self):
         """Connect to IMAP server"""
         try:
-            mail = imaplib.IMAP4_SSL(self.imap_server)
+            # Connect to IMAP server on port 993 (SSL)
+            mail = imaplib.IMAP4_SSL(self.imap_server, 993)
             mail.login(self.email_user, self.email_pass)
             mail.select('inbox')
             return mail
