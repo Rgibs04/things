@@ -24,13 +24,13 @@ TEMP_DIR="/tmp/classdojo-server-install"
 clear
 echo -e "${CYAN}"
 cat << "EOF"
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║   ClassDojo Debit System - Server Installer              ║
-║                                                           ║
-║   Web Interface & Database for Central Server            ║
-║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
+#╔═══════════════════════════════════════════════════════════╗
+#║                                                           ║
+#║   ClassDojo Debit System - Server Installer               ║
+#║                                                           ║
+#║   Web Interface & Database for Central Server             ║
+#║                                                           ║
+#╚═══════════════════════════════════════════════════════════╝
 EOF
 echo -e "${NC}"
 echo ""
