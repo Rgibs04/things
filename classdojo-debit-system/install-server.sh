@@ -124,7 +124,7 @@ echo -e "  Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" 
 echo -e "  Directory: ${CYAN}${INSTALL_DIR}${NC}"
 echo -e "  Estimated time: ${CYAN}10-15 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-echo ""
+#echo ""
 read -p "Proceed with server installation? (Y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
