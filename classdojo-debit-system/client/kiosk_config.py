@@ -18,7 +18,7 @@ class KioskConfig:
 
         # Default configuration
         return {
-            'server_url': 'http://localhost:5000',
+            'server_url': 'http://192.168.0.15:5000',
             'kiosk_id': self.generate_kiosk_id(),
             'kiosk_name': socket.gethostname(),
             'admin_code': 'ADMIN123',
@@ -28,7 +28,7 @@ class KioskConfig:
             'rfid_baudrate': 9600,
             'fullscreen': True,
             'auto_update': True,
-            'github_repo': 'yourusername/classdojo-debit-system',
+            'github_repo': 'Rgibs04/things',
             'update_interval_hours': 24
         }
 
