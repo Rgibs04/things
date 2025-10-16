@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# ClassDojo Debit System - Server Installer
-# Installs the server component (web interface and database)
-# Usage: curl -sSL https://raw.githubusercontent.com/things/master/install-server.sh | sudo bash
-
 set -e
 
 RED='\033[0;31m'
