@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from database_enhanced import DebitCardDatabase
+from database import DebitCardDatabase
 import os
 
 app = Flask(__name__, 
@@ -54,8 +54,8 @@ def add_student():
         card_id = request.form.get('card_id')
         initial_balance = int(request.form.get('initial_balance', 0))
         
-        success = db.add_student(student_id, first_name, last_name,
-                                class_name, card_id, initial_balance, False)
+        success = db.add_student(student_id, first_name, last_name, 
+                                class_name, card_id, initial_balance)
         
         if success:
             flash(f'Student {first_name} {last_name} added successfully!', 'success')
@@ -88,7 +88,8 @@ def transaction():
         if transaction_type == 'purchase':
             amount = -abs(amount)
         
-        success = db.process_transaction(student_id, amount, description, location)
+        success = db.update_balance(student_id, amount, transaction_type, 
+                                   description, location)
         
         if success:
             flash(f'Transaction successful! Amount: {amount} points', 'success')
@@ -194,7 +195,8 @@ def api_transaction():
     if transaction_type == 'purchase':
         amount = -abs(amount)
     
-    success = db.process_transaction(student_id, amount, description, location)
+    success = db.update_balance(student_id, amount, transaction_type, 
+                               description, location)
     
     if success:
         updated_student = db.get_student_by_id(student_id)

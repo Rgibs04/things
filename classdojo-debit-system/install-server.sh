@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ClassDojo Debit System - Universal Installer
-# Installs either server or client components
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install.sh | sudo bash
+# ClassDojo Debit System - Server Installer
+# Installs the server component (web interface and database)
+# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install-server.sh | sudo bash
 
 set -e
 
@@ -18,8 +18,7 @@ NC='\033[0m' # No Color
 REPO_URL="https://github.com/Rgibs04/things.git"
 REPO_SUBDIR="classdojo-debit-system"
 INSTALL_DIR="/opt/classdojo"
-CLIENT_DIR="/opt/classdojo-client"
-TEMP_DIR="/tmp/classdojo-install"
+TEMP_DIR="/tmp/classdojo-server-install"
 
 # Banner
 clear
@@ -27,9 +26,9 @@ echo -e "${CYAN}"
 cat << "EOF"
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║   ClassDojo Debit System - Universal Installer           ║
+║   ClassDojo Debit System - Server Installer              ║
 ║                                                           ║
-║   Server & Client Installation for Debian/Ubuntu         ║
+║   Web Interface & Database for Central Server            ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
 EOF
@@ -37,7 +36,7 @@ echo -e "${NC}"
 echo ""
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]; then 
+if [ "$EUID" -ne 0 ]; then
     echo -e "${RED}Error: This script must be run as root or with sudo${NC}"
     echo -e "Please run: ${YELLOW}curl -sSL [URL] | sudo bash${NC}"
     exit 1
@@ -69,25 +68,13 @@ else
 fi
 echo ""
 
-# Choose installation type
-echo -e "${CYAN}Choose installation type:${NC}"
-echo -e "  ${GREEN}1)${NC} Server - Web admin interface and database"
-echo -e "  ${GREEN}2)${NC} Client - Kiosk touchscreen application"
-echo -e "  ${GREEN}3)${NC} Both - Install both server and client"
+# Choose server installation method
+echo -e "${CYAN}Choose server installation method:${NC}"
+echo -e "  ${GREEN}1)${NC} Docker Compose (Recommended - easy management)"
+echo -e "  ${GREEN}2)${NC} Standalone Python (minimal resources)"
 echo ""
-read -p "Enter choice [1-3] (default: 1): " INSTALL_TYPE
-INSTALL_TYPE=${INSTALL_TYPE:-1}
-
-# Choose server installation method (if installing server)
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${CYAN}Choose server installation method:${NC}"
-    echo -e "  ${GREEN}1)${NC} Docker Compose (Recommended)"
-    echo -e "  ${GREEN}2)${NC} Standalone Python"
-    echo ""
-    read -p "Enter choice [1-2] (default: 1): " SERVER_METHOD
-    SERVER_METHOD=${SERVER_METHOD:-1}
-fi
+read -p "Enter choice [1-2] (default: 1): " SERVER_METHOD
+SERVER_METHOD=${SERVER_METHOD:-1}
 
 # Pre-flight checks
 echo ""
@@ -131,27 +118,13 @@ echo ""
 # Confirm installation
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${YELLOW}Installation Summary:${NC}"
-case $INSTALL_TYPE in
-    1)
-        echo -e "  Type: ${CYAN}Server only${NC}"
-        echo -e "  Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" || echo "Standalone Python")${NC}"
-        echo -e "  Directory: ${CYAN}${INSTALL_DIR}${NC}"
-        ;;
-    2)
-        echo -e "  Type: ${CYAN}Client only${NC}"
-        echo -e "  Directory: ${CYAN}${CLIENT_DIR}${NC}"
-        ;;
-    3)
-        echo -e "  Type: ${CYAN}Server and Client${NC}"
-        echo -e "  Server Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" || echo "Standalone Python")${NC}"
-        echo -e "  Server Directory: ${CYAN}${INSTALL_DIR}${NC}"
-        echo -e "  Client Directory: ${CYAN}${CLIENT_DIR}${NC}"
-        ;;
-esac
-echo -e "  Estimated time: ${CYAN}10-20 minutes${NC}"
+echo -e "  Component: ${CYAN}Server (Web Interface & Database)${NC}"
+echo -e "  Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" || echo "Standalone Python")${NC}"
+echo -e "  Directory: ${CYAN}${INSTALL_DIR}${NC}"
+echo -e "  Estimated time: ${CYAN}10-15 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo ""
-read -p "Proceed with installation? (Y/n) " -n 1 -r
+read -p "Proceed with server installation? (Y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo -e "${YELLOW}Installation cancelled${NC}"
@@ -190,50 +163,25 @@ else
 fi
 
 # Install server
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${BLUE}Installing Server Component...${NC}"
-    
-    if [ "$SERVER_METHOD" = "1" ]; then
-        # Docker Compose installation
-        if [ -f "./docker-compose-install.sh" ]; then
-            chmod +x ./docker-compose-install.sh
-            bash ./docker-compose-install.sh
-        else
-            echo -e "${RED}Error: docker-compose-install.sh not found${NC}"
-            exit 1
-        fi
-    else
-        # Standalone Python installation
-        if [ -f "./standalone-install.sh" ]; then
-            chmod +x ./standalone-install.sh
-            bash ./standalone-install.sh
-        else
-            echo -e "${RED}Error: standalone-install.sh not found${NC}"
-            exit 1
-        fi
-    fi
-fi
+echo ""
+echo -e "${BLUE}Installing Server Component...${NC}"
 
-# Install client
-if [ "$INSTALL_TYPE" = "2" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${BLUE}Installing Client Component...${NC}"
-    
-    if [ -d "./client" ]; then
-        mkdir -p ${CLIENT_DIR}
-        cp -r ./client/* ${CLIENT_DIR}/
-        cd ${CLIENT_DIR}
-        
-        if [ -f "./install.sh" ]; then
-            chmod +x ./install.sh
-            bash ./install.sh
-        else
-            echo -e "${RED}Error: client/install.sh not found${NC}"
-            exit 1
-        fi
+if [ "$SERVER_METHOD" = "1" ]; then
+    # Docker Compose installation
+    if [ -f "./docker-compose-install.sh" ]; then
+        chmod +x ./docker-compose-install.sh
+        bash ./docker-compose-install.sh
     else
-        echo -e "${RED}Error: client directory not found${NC}"
+        echo -e "${RED}Error: docker-compose-install.sh not found${NC}"
+        exit 1
+    fi
+else
+    # Standalone Python installation
+    if [ -f "./standalone-install.sh" ]; then
+        chmod +x ./standalone-install.sh
+        bash ./standalone-install.sh
+    else
+        echo -e "${RED}Error: standalone-install.sh not found${NC}"
         exit 1
     fi
 fi
@@ -248,40 +196,34 @@ rm -rf "$TEMP_DIR"
 echo ""
 echo -e "${GREEN}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║                                                           ║${NC}"
-echo -e "${GREEN}║   Installation completed successfully! 🎉                ║${NC}"
+echo -e "${GREEN}║   Server installation completed successfully! 🎉         ║${NC}"
 echo -e "${GREEN}║                                                           ║${NC}"
 echo -e "${GREEN}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "${CYAN}Next steps:${NC}"
+echo -e "${CYAN}Server Access:${NC}"
+echo -e "  Web Admin: ${GREEN}http://localhost:5000${NC}"
+echo -e "  Network: ${GREEN}http://[SERVER_IP]:5000${NC}"
 echo ""
-
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Server:${NC}"
-    echo -e "  Access admin panel: http://localhost:5000/admin/login"
-    echo -e "  Default admin password: admin123 (change this!)"
-    echo -e "  Import students via CSV email or web interface"
-    echo ""
+echo -e "${CYAN}Next steps:${NC}"
+echo -e "  1. Access the web interface to set up admin account"
+echo -e "  2. Import student data via CSV or email monitoring"
+echo -e "  3. Configure kiosk clients to connect to this server"
+echo -e "  4. Set up regular database backups"
+echo ""
+echo -e "${YELLOW}Management Commands:${NC}"
+if [ "$SERVER_METHOD" = "1" ]; then
+    echo -e "  Start: ${BLUE}classdojo-manage start${NC}"
+    echo -e "  Stop: ${BLUE}classdojo-manage stop${NC}"
+    echo -e "  Logs: ${BLUE}classdojo-manage logs${NC}"
+    echo -e "  Backup: ${BLUE}classdojo-manage backup${NC}"
+else
+    echo -e "  Status: ${BLUE}sudo systemctl status classdojo${NC}"
+    echo -e "  Logs: ${BLUE}sudo journalctl -u classdojo -f${NC}"
 fi
-
-if [ "$INSTALL_TYPE" = "2" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Client:${NC}"
-    echo -e "  Configure server URL in kiosk_config.json"
-    echo -e "  Connect RFID reader to USB port"
-    echo -e "  Run: cd ${CLIENT_DIR} && ./start-kiosk.sh"
-    echo ""
-fi
-
-if [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Integration:${NC}"
-    echo -e "  Client will auto-discover server on local network"
-    echo -e "  Or manually set server_url in client/kiosk_config.json"
-    echo ""
-fi
-
+echo ""
 echo -e "${YELLOW}Documentation:${NC}"
-echo -e "  Server: ${INSTALL_DIR}/README-COMPREHENSIVE.md"
-echo -e "  Client: ${CLIENT_DIR}/README.md"
+echo -e "  Server Guide: ${INSTALL_DIR}/README-COMPREHENSIVE.md"
 echo -e "  Installation: ${INSTALL_DIR}/INSTALL.md"
 echo ""
-echo -e "${GREEN}Thank you for using ClassDojo Debit System!${NC}"
+echo -e "${GREEN}Server is ready for kiosk client connections!${NC}"
 echo ""

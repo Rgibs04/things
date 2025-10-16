@@ -1,188 +1,157 @@
 # 🚀 Quick Install - ClassDojo Debit System
 
-## One-Line Installation for Raspberry Pi 3B
+## Separate Server & Client Installation
 
-### Install Now (Choose One Method)
+### Step 1: Install Server (Central Database)
+On your server machine (Raspberry Pi 3B+ or Ubuntu server):
+```bash
+curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install-server.sh | sudo bash
+```
 
-#### From GitHub (Recommended)
+### Step 2: Install Clients (POS Terminals)
+On each kiosk/touchscreen device:
+```bash
+curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install-client.sh | sudo bash
+```
+
+### Alternative: Universal Installer (Both on Same Machine)
+For testing or single-machine setup:
 ```bash
 curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install.sh | sudo bash
 ```
 
-#### Or with wget
-```bash
-wget -qO- https://raw.githubusercontent.com/YOUR_USERNAME/classdojo-debit-system/main/install.sh | sudo bash
-```
-
-#### From Local Files
-```bash
-cd classdojo-debit-system
-chmod +x install.sh
-sudo bash install.sh
-```
-
 ---
 
-## What Happens Next?
+## What Gets Installed Where?
 
-The installer will:
-1. ✅ Check your system (RAM, disk, architecture)
-2. ✅ Ask you to choose installation method:
-   - **K3s (Kubernetes)** - Production ready, full orchestration
-   - **Docker Compose** - Recommended, easy to manage ⭐
-   - **Standalone Python** - Minimal resources, no containers
-3. ✅ Install all dependencies automatically
-4. ✅ Build and deploy the application
-5. ✅ Configure automatic startup
+### Server Machine
+- ✅ Web admin interface (http://server:5000)
+- ✅ SQLite database with student data
+- ✅ REST API for client connections
+- ✅ Email monitoring for CSV imports
+- ✅ Transaction processing and reporting
 
-**Time:** 15-30 minutes  
-**Requirements:** Raspberry Pi 3B+, 512MB+ RAM, 4GB+ free disk
+### Client Machines (Kiosks)
+- ✅ Touchscreen kiosk application
+- ✅ RFID card reader support
+- ✅ Real-time connection to server
+- ✅ Transaction processing interface
+- ✅ Auto-locking security features
 
 ---
 
 ## After Installation
 
-### Access Your Application
-
-**From the Raspberry Pi:**
+### Server Access
 ```
-http://localhost:5000
+http://[SERVER_IP]:5000
 ```
 
-**From another device:**
-```
-http://[YOUR_PI_IP]:5000
-```
+### Client Configuration
+Clients automatically discover the server on your local network, or you can manually configure the server IP during installation.
 
-Find your IP:
+### Quick Management
+
+**Server (Docker Compose):**
 ```bash
-hostname -I
+classdojo-manage start/stop/logs/backup/access
 ```
 
-### Quick Commands
-
-**Docker Compose (Recommended):**
+**Client (Kiosk):**
 ```bash
-classdojo-manage start      # Start
-classdojo-manage stop       # Stop
-classdojo-manage restart    # Restart
-classdojo-manage logs       # View logs
-classdojo-manage backup     # Backup database
-classdojo-manage access     # Show URLs
-```
-
-**K3s (Kubernetes):**
-```bash
-sudo k3s kubectl get pods -n classdojo-system
-sudo k3s kubectl logs -n classdojo-system -l app=classdojo-debit-system -f
-classdojo-access
-```
-
-**Standalone Python:**
-```bash
-sudo systemctl status classdojo
-sudo systemctl restart classdojo
-sudo journalctl -u classdojo -f
+cd /opt/classdojo-client
+./start-kiosk.sh          # Production mode
+./start-kiosk.sh --dev    # Development mode
 ```
 
 ---
 
 ## System Requirements
 
-### Minimum
-- Raspberry Pi 3B or newer
-- 512MB RAM
-- 4GB free disk space
-- Debian/Raspberry Pi OS
+### Server Machine
+- Raspberry Pi 3B+ or Ubuntu/Debian server
+- 512MB+ RAM, 4GB+ disk
+- Static IP recommended
 - Internet connection
 
-### Recommended
-- Raspberry Pi 3B+ or 4
-- 1GB+ RAM
-- 8GB+ free disk space
-- Ethernet connection
-- 32GB SD card (Class 10)
+### Client Machines (Kiosks)
+- Raspberry Pi 3B+ with touchscreen
+- 256MB+ RAM, 2GB+ disk
+- USB RFID reader (optional)
+- Network connection to server
 
 ---
 
-## Troubleshooting
+## Network Setup
 
-### Installation fails?
-```bash
-# Check requirements
-free -h          # RAM
-df -h            # Disk space
-ping 8.8.8.8     # Internet
+1. **Server**: Set static IP (192.168.1.100)
+2. **Clients**: Connect to same network
+3. **Firewall**: Allow port 5000 between server/clients
+4. **Discovery**: Clients auto-find server, or configure manually
 
-# View logs
-sudo journalctl -xe
-```
+---
 
-### Can't access application?
+## Features
+
+- 👥 Student management & card assignment
+- 💰 Real-time transaction processing
+- 📊 Balance tracking & reporting
+- 🏷️ RFID card reader support
+- 🔒 Kiosk lockdown mode
+- 📥 Automatic CSV import via email
+- 🌐 Web admin interface
+- 🔄 Multi-device synchronization
+
+---
+
+## Quick Troubleshooting
+
+### Server Issues
 ```bash
 # Check if running
-docker ps                    # Docker Compose
-sudo k3s kubectl get pods    # K3s
-sudo systemctl status classdojo  # Standalone
+curl http://localhost:5000/health
 
-# Check firewall
-sudo ufw allow 5000/tcp
+# View logs
+classdojo-manage logs
 ```
 
-### Out of memory?
+### Client Issues
 ```bash
-# Increase swap
-sudo dphys-swapfile swapoff
-sudo nano /etc/dphys-swapfile
-# Set CONF_SWAPSIZE=1024
-sudo dphys-swapfile setup
-sudo dphys-swapfile swapon
+# Test connection
+curl http://[SERVER_IP]:5000/health
+
+# Start in dev mode
+cd /opt/classdojo-client && ./start-kiosk.sh --dev
+```
+
+### Network Issues
+```bash
+# Check connectivity
+ping [SERVER_IP]
+
+# Allow port 5000
+sudo ufw allow 5000/tcp
 ```
 
 ---
 
 ## Documentation
 
-- **Full Installation Guide:** [INSTALL.md](INSTALL.md)
-- **User Guide:** [README.md](README.md)
-- **Raspberry Pi Guide:** [RASPBERRY-PI-GUIDE.md](RASPBERRY-PI-GUIDE.md)
-- **Quick Start:** [RASPBERRY-PI-QUICKSTART.md](RASPBERRY-PI-QUICKSTART.md)
-
----
-
-## Features
-
-- 👥 Student management
-- 💳 Card assignment
-- 💰 Transaction processing
-- 📊 Balance tracking
-- 📜 Transaction history
-- 📥 CSV import
-- 🌐 Web interface
-- 🔌 REST API
-
----
-
-## Security Tips
-
-1. Change default Pi password: `passwd`
-2. Enable firewall: `sudo ufw enable`
-3. Keep system updated: `sudo apt-get update && sudo apt-get upgrade`
-4. Set up regular backups: `classdojo-manage backup`
-5. Use static IP for easier access
+- **Full Guide:** [INSTALL.md](INSTALL.md)
+- **Server Setup:** [README-COMPREHENSIVE.md](README-COMPREHENSIVE.md)
+- **Client Setup:** [client/README.md](client/README.md)
 
 ---
 
 ## Next Steps
 
-1. ✅ Access web interface
-2. ✅ Import student data
-3. ✅ Assign cards
-4. ✅ Process transactions
-5. ✅ Set up backups
+1. ✅ Install server on central machine
+2. ✅ Install clients on POS terminals
+3. ✅ Configure network connectivity
+4. ✅ Import student data on server
+5. ✅ Test card transactions
+6. ✅ Set up backups
 
 ---
 
-**Questions?** See [INSTALL.md](INSTALL.md) for detailed documentation.
-
-**Ready to install?** Run the one-liner command above! 🎉
+**Ready to deploy?** Start with the server installation! 🎉

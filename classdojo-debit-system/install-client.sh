@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ClassDojo Debit System - Universal Installer
-# Installs either server or client components
-# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install.sh | sudo bash
+# ClassDojo Debit System - Client Installer
+# Installs the kiosk client component on POS terminals
+# Usage: curl -sSL https://raw.githubusercontent.com/YOUR_REPO/main/install-client.sh | sudo bash
 
 set -e
 
@@ -17,9 +17,8 @@ NC='\033[0m' # No Color
 # Configuration
 REPO_URL="https://github.com/Rgibs04/things.git"
 REPO_SUBDIR="classdojo-debit-system"
-INSTALL_DIR="/opt/classdojo"
 CLIENT_DIR="/opt/classdojo-client"
-TEMP_DIR="/tmp/classdojo-install"
+TEMP_DIR="/tmp/classdojo-client-install"
 
 # Banner
 clear
@@ -27,9 +26,9 @@ echo -e "${CYAN}"
 cat << "EOF"
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║   ClassDojo Debit System - Universal Installer           ║
+║   ClassDojo Debit System - Client Installer              ║
 ║                                                           ║
-║   Server & Client Installation for Debian/Ubuntu         ║
+║   Kiosk Application for POS Terminals                    ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
 EOF
@@ -37,7 +36,7 @@ echo -e "${NC}"
 echo ""
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]; then 
+if [ "$EUID" -ne 0 ]; then
     echo -e "${RED}Error: This script must be run as root or with sudo${NC}"
     echo -e "Please run: ${YELLOW}curl -sSL [URL] | sudo bash${NC}"
     exit 1
@@ -65,45 +64,38 @@ if grep -q "Raspberry Pi" /proc/cpuinfo 2>/dev/null; then
     echo -e "${GREEN}✓ Raspberry Pi detected: ${RPI_MODEL}${NC}"
 else
     echo -e "${YELLOW}⚠ Not running on Raspberry Pi hardware${NC}"
-    echo -e "${YELLOW}  Continuing anyway, but some optimizations may not apply${NC}"
+    echo -e "${YELLOW}  Continuing anyway, but touchscreen may not work${NC}"
 fi
 echo ""
 
-# Choose installation type
-echo -e "${CYAN}Choose installation type:${NC}"
-echo -e "  ${GREEN}1)${NC} Server - Web admin interface and database"
-echo -e "  ${GREEN}2)${NC} Client - Kiosk touchscreen application"
-echo -e "  ${GREEN}3)${NC} Both - Install both server and client"
+# Get server information
+echo -e "${CYAN}Server Configuration:${NC}"
+echo -e "The kiosk client needs to connect to a ClassDojo Debit System server."
 echo ""
-read -p "Enter choice [1-3] (default: 1): " INSTALL_TYPE
-INSTALL_TYPE=${INSTALL_TYPE:-1}
+read -p "Enter server IP address or hostname (default: auto-discover): " SERVER_IP
+SERVER_IP=${SERVER_IP:-"auto"}
 
-# Choose server installation method (if installing server)
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${CYAN}Choose server installation method:${NC}"
-    echo -e "  ${GREEN}1)${NC} Docker Compose (Recommended)"
-    echo -e "  ${GREEN}2)${NC} Standalone Python"
-    echo ""
-    read -p "Enter choice [1-2] (default: 1): " SERVER_METHOD
-    SERVER_METHOD=${SERVER_METHOD:-1}
+if [ "$SERVER_IP" = "auto" ]; then
+    echo -e "${YELLOW}Client will auto-discover server on local network${NC}"
+else
+    echo -e "${GREEN}Client will connect to server: ${SERVER_IP}${NC}"
 fi
+echo ""
 
 # Pre-flight checks
-echo ""
 echo -e "${BLUE}Running pre-flight checks...${NC}"
 
-# Check RAM (minimum 512MB)
-if [ "$TOTAL_RAM" -lt 512 ]; then
-    echo -e "${RED}✗ Insufficient RAM: ${TOTAL_RAM}MB (minimum 512MB required)${NC}"
+# Check RAM (minimum 256MB for client)
+if [ "$TOTAL_RAM" -lt 256 ]; then
+    echo -e "${RED}✗ Insufficient RAM: ${TOTAL_RAM}MB (minimum 256MB required)${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ RAM check passed${NC}"
 
-# Check disk space (minimum 4GB)
+# Check disk space (minimum 2GB)
 FREE_DISK=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
-if [ "$FREE_DISK" -lt 4 ]; then
-    echo -e "${RED}✗ Insufficient disk space: ${FREE_DISK}GB free (minimum 4GB required)${NC}"
+if [ "$FREE_DISK" -lt 2 ]; then
+    echo -e "${RED}✗ Insufficient disk space: ${FREE_DISK}GB free (minimum 2GB required)${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ Disk space check passed${NC}"
@@ -122,7 +114,7 @@ echo -e "${GREEN}✓ Architecture check passed${NC}"
 # Check internet connectivity
 if ! ping -c 1 8.8.8.8 &> /dev/null; then
     echo -e "${RED}✗ No internet connection detected${NC}"
-    echo -e "${RED}  Please connect to the internet and try again${NC}"
+    echo -e "${RED}  Client needs internet to connect to server${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ Internet connectivity check passed${NC}"
@@ -131,27 +123,13 @@ echo ""
 # Confirm installation
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${YELLOW}Installation Summary:${NC}"
-case $INSTALL_TYPE in
-    1)
-        echo -e "  Type: ${CYAN}Server only${NC}"
-        echo -e "  Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" || echo "Standalone Python")${NC}"
-        echo -e "  Directory: ${CYAN}${INSTALL_DIR}${NC}"
-        ;;
-    2)
-        echo -e "  Type: ${CYAN}Client only${NC}"
-        echo -e "  Directory: ${CYAN}${CLIENT_DIR}${NC}"
-        ;;
-    3)
-        echo -e "  Type: ${CYAN}Server and Client${NC}"
-        echo -e "  Server Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" || echo "Standalone Python")${NC}"
-        echo -e "  Server Directory: ${CYAN}${INSTALL_DIR}${NC}"
-        echo -e "  Client Directory: ${CYAN}${CLIENT_DIR}${NC}"
-        ;;
-esac
-echo -e "  Estimated time: ${CYAN}10-20 minutes${NC}"
+echo -e "  Component: ${CYAN}Client (Kiosk Application)${NC}"
+echo -e "  Server: ${CYAN}$([ "$SERVER_IP" = "auto" ] && echo "Auto-discover" || echo "$SERVER_IP")${NC}"
+echo -e "  Directory: ${CYAN}${CLIENT_DIR}${NC}"
+echo -e "  Estimated time: ${CYAN}5-10 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo ""
-read -p "Proceed with installation? (Y/n) " -n 1 -r
+read -p "Proceed with client installation? (Y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo -e "${YELLOW}Installation cancelled${NC}"
@@ -189,53 +167,47 @@ else
     exit 1
 fi
 
-# Install server
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${BLUE}Installing Server Component...${NC}"
-    
-    if [ "$SERVER_METHOD" = "1" ]; then
-        # Docker Compose installation
-        if [ -f "./docker-compose-install.sh" ]; then
-            chmod +x ./docker-compose-install.sh
-            bash ./docker-compose-install.sh
-        else
-            echo -e "${RED}Error: docker-compose-install.sh not found${NC}"
-            exit 1
-        fi
-    else
-        # Standalone Python installation
-        if [ -f "./standalone-install.sh" ]; then
-            chmod +x ./standalone-install.sh
-            bash ./standalone-install.sh
-        else
-            echo -e "${RED}Error: standalone-install.sh not found${NC}"
-            exit 1
-        fi
-    fi
-fi
-
 # Install client
-if [ "$INSTALL_TYPE" = "2" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo ""
-    echo -e "${BLUE}Installing Client Component...${NC}"
-    
-    if [ -d "./client" ]; then
-        mkdir -p ${CLIENT_DIR}
-        cp -r ./client/* ${CLIENT_DIR}/
-        cd ${CLIENT_DIR}
-        
-        if [ -f "./install.sh" ]; then
-            chmod +x ./install.sh
-            bash ./install.sh
-        else
-            echo -e "${RED}Error: client/install.sh not found${NC}"
-            exit 1
-        fi
+echo ""
+echo -e "${BLUE}Installing Client Component...${NC}"
+
+if [ -d "./client" ]; then
+    mkdir -p ${CLIENT_DIR}
+    cp -r ./client/* ${CLIENT_DIR}/
+    cd ${CLIENT_DIR}
+
+    if [ -f "./install.sh" ]; then
+        chmod +x ./install.sh
+        bash ./install.sh
     else
-        echo -e "${RED}Error: client directory not found${NC}"
+        echo -e "${RED}Error: client/install.sh not found${NC}"
         exit 1
     fi
+else
+    echo -e "${RED}Error: client directory not found${NC}"
+    exit 1
+fi
+
+# Configure server connection
+echo ""
+echo -e "${BLUE}Configuring server connection...${NC}"
+
+if [ -f "kiosk_config.json" ]; then
+    # Update existing config
+    if [ "$SERVER_IP" != "auto" ]; then
+        # Use jq if available, otherwise sed
+        if command -v jq &> /dev/null; then
+            jq --arg server "http://$SERVER_IP:5000" '.server_url = $server' kiosk_config.json > temp.json && mv temp.json kiosk_config.json
+        else
+            # Fallback to sed (basic replacement)
+            sed -i "s|\"server_url\": \"[^\"]*\"|\"server_url\": \"http://$SERVER_IP:5000\"|g" kiosk_config.json
+        fi
+        echo -e "${GREEN}✓ Server URL configured: http://$SERVER_IP:5000${NC}"
+    else
+        echo -e "${GREEN}✓ Auto-discovery enabled (client will find server automatically)${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠ Config file not found - will be created on first run${NC}"
 fi
 
 # Cleanup
@@ -248,40 +220,35 @@ rm -rf "$TEMP_DIR"
 echo ""
 echo -e "${GREEN}╔═══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║                                                           ║${NC}"
-echo -e "${GREEN}║   Installation completed successfully! 🎉                ║${NC}"
+echo -e "${GREEN}║   Client installation completed successfully! 🎉         ║${NC}"
 echo -e "${GREEN}║                                                           ║${NC}"
 echo -e "${GREEN}╚═══════════════════════════════════════════════════════════╝${NC}"
 echo ""
+echo -e "${CYAN}Client Configuration:${NC}"
+if [ "$SERVER_IP" != "auto" ]; then
+    echo -e "  Server: ${GREEN}http://$SERVER_IP:5000${NC}"
+else
+    echo -e "  Server: ${GREEN}Auto-discovering on local network${NC}"
+fi
+echo ""
 echo -e "${CYAN}Next steps:${NC}"
+echo -e "  1. Connect RFID reader to USB port"
+echo -e "  2. Test kiosk: cd ${CLIENT_DIR} && ./start-kiosk.sh --dev"
+echo -e "  3. For production: ./start-kiosk.sh (fullscreen mode)"
+echo -e "  4. Configure auto-startup if needed"
 echo ""
-
-if [ "$INSTALL_TYPE" = "1" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Server:${NC}"
-    echo -e "  Access admin panel: http://localhost:5000/admin/login"
-    echo -e "  Default admin password: admin123 (change this!)"
-    echo -e "  Import students via CSV email or web interface"
-    echo ""
-fi
-
-if [ "$INSTALL_TYPE" = "2" ] || [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Client:${NC}"
-    echo -e "  Configure server URL in kiosk_config.json"
-    echo -e "  Connect RFID reader to USB port"
-    echo -e "  Run: cd ${CLIENT_DIR} && ./start-kiosk.sh"
-    echo ""
-fi
-
-if [ "$INSTALL_TYPE" = "3" ]; then
-    echo -e "${GREEN}Integration:${NC}"
-    echo -e "  Client will auto-discover server on local network"
-    echo -e "  Or manually set server_url in client/kiosk_config.json"
-    echo ""
-fi
-
+echo -e "${YELLOW}RFID Reader Setup:${NC}"
+echo -e "  - Check device: ls /dev/ttyUSB*"
+echo -e "  - Update rfid_port in kiosk_config.json if needed"
+echo -e "  - Test with: ./start-kiosk.sh --mock-rfid"
+echo ""
+echo -e "${YELLOW}Management Commands:${NC}"
+echo -e "  Start kiosk: ${BLUE}cd ${CLIENT_DIR} && ./start-kiosk.sh${NC}"
+echo -e "  Stop kiosk: ${BLUE}Ctrl+C or pkill -f kiosk_app.py${NC}"
+echo -e "  View logs: ${BLUE}tail -f ${CLIENT_DIR}/kiosk.log${NC}"
+echo ""
 echo -e "${YELLOW}Documentation:${NC}"
-echo -e "  Server: ${INSTALL_DIR}/README-COMPREHENSIVE.md"
-echo -e "  Client: ${CLIENT_DIR}/README.md"
-echo -e "  Installation: ${INSTALL_DIR}/INSTALL.md"
+echo -e "  Client Guide: ${CLIENT_DIR}/README.md"
 echo ""
-echo -e "${GREEN}Thank you for using ClassDojo Debit System!${NC}"
+echo -e "${GREEN}Client is ready to connect to server!${NC}"
 echo ""
