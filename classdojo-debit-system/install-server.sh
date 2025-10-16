@@ -19,18 +19,19 @@ REPO_URL="https://github.com/Rgibs04/things.git"
 REPO_SUBDIR="classdojo-debit-system"
 INSTALL_DIR="/opt/classdojo"
 TEMP_DIR="/tmp/classdojo-server-install"
+#CLIENT_DIR="/opt/classdojo-client"
 
 # Banner
 clear
 echo -e "${CYAN}"
 cat << "EOF"
-#╔═══════════════════════════════════════════════════════════╗
-#║                                                           ║
-#║   ClassDojo Debit System - Server Installer               ║
-#║                                                           ║
-#║   Web Interface & Database for Central Server             ║
-#║                                                           ║
-#╚═══════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   ClassDojo Debit System - Server Installer               ║
+║                                                           ║
+║   Web Interface & Database for Central Server             ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
 EOF
 echo -e "${NC}"
 echo ""
