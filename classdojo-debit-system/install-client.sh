@@ -129,7 +129,7 @@ echo -e "  Directory: ${CYAN}${CLIENT_DIR}${NC}"
 echo -e "  Estimated time: ${CYAN}5-10 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo ""
-read -p "Proceed with client installation? (Y/n) " -n 1 -r
+#read -p "Proceed with client installation? (Y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo -e "${YELLOW}Installation cancelled${NC}"
