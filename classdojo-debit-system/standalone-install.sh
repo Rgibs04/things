@@ -26,7 +26,7 @@ fi
 
 # Configuration
 APP_DIR="/opt/classdojo"
-SERVICE_USER="pi"
+SERVICE_USER="pos-server"
 
 echo -e "${BLUE}Step 1/7: Updating system packages...${NC}"
 apt-get update
