@@ -6,22 +6,18 @@
 
 set -e
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Configuration
 REPO_URL="https://github.com/Rgibs04/things.git"
 REPO_SUBDIR="classdojo-debit-system"
 INSTALL_DIR="/opt/classdojo"
 TEMP_DIR="/tmp/classdojo-server-install"
-#CLIENT_DIR="/opt/classdojo-client"
 
-# Banner
 clear
 echo -e "${CYAN}"
 cat << "EOF"
@@ -36,14 +32,12 @@ EOF
 echo -e "${NC}"
 echo ""
 
-# Check if running as root
 if [ "$EUID" -ne 0 ]; then
     echo -e "${RED}Error: This script must be run as root or with sudo${NC}"
     echo -e "Please run: ${YELLOW}curl -sSL [URL] | sudo bash${NC}"
     exit 1
 fi
 
-# Detect system information
 echo -e "${BLUE}Detecting system information...${NC}"
 OS_NAME=$(grep ^NAME /etc/os-release | cut -d'"' -f2)
 OS_VERSION=$(grep ^VERSION_ID /etc/os-release | cut -d'"' -f2)
@@ -57,7 +51,6 @@ echo -e "  RAM: ${GREEN}${TOTAL_RAM}MB${NC}"
 echo -e "  Disk Space: ${GREEN}${TOTAL_DISK}GB${NC}"
 echo ""
 
-# Check if Raspberry Pi
 IS_RPI=false
 if grep -q "Raspberry Pi" /proc/cpuinfo 2>/dev/null; then
     IS_RPI=true
@@ -69,7 +62,6 @@ else
 fi
 echo ""
 
-# Choose server installation method
 echo -e "${CYAN}Choose server installation method:${NC}"
 echo -e "  ${GREEN}1)${NC} Docker Compose (Recommended - easy management)"
 echo -e "  ${GREEN}2)${NC} Standalone Python (minimal resources)"
@@ -77,18 +69,15 @@ echo ""
 read -p "Enter choice [1-2] (default: 1): " SERVER_METHOD
 SERVER_METHOD=${SERVER_METHOD:-1}
 
-# Pre-flight checks
 echo ""
 echo -e "${BLUE}Running pre-flight checks...${NC}"
 
-# Check RAM (minimum 512MB)
 if [ "$TOTAL_RAM" -lt 512 ]; then
     echo -e "${RED}✗ Insufficient RAM: ${TOTAL_RAM}MB (minimum 512MB required)${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ RAM check passed${NC}"
 
-# Check disk space (minimum 4GB)
 FREE_DISK=$(df -BG / | awk 'NR==2 {print $4}' | sed 's/G//')
 if [ "$FREE_DISK" -lt 4 ]; then
     echo -e "${RED}✗ Insufficient disk space: ${FREE_DISK}GB free (minimum 4GB required)${NC}"
@@ -96,7 +85,6 @@ if [ "$FREE_DISK" -lt 4 ]; then
 fi
 echo -e "${GREEN}✓ Disk space check passed${NC}"
 
-# Check architecture (ARM for Pi, x86_64 for others)
 if [[ ! "$ARCH" =~ ^(armv7l|aarch64|x86_64)$ ]]; then
     echo -e "${YELLOW}⚠ Warning: Architecture ${ARCH} may not be fully supported${NC}"
     read -p "Continue anyway? (y/N) " -n 1 -r
@@ -107,7 +95,6 @@ if [[ ! "$ARCH" =~ ^(armv7l|aarch64|x86_64)$ ]]; then
 fi
 echo -e "${GREEN}✓ Architecture check passed${NC}"
 
-# Check internet connectivity
 if ! ping -c 1 8.8.8.8 &> /dev/null; then
     echo -e "${RED}✗ No internet connection detected${NC}"
     echo -e "${RED}  Please connect to the internet and try again${NC}"
@@ -116,7 +103,6 @@ fi
 echo -e "${GREEN}✓ Internet connectivity check passed${NC}"
 echo ""
 
-# Confirm installation
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${YELLOW}Installation Summary:${NC}"
 echo -e "  Component: ${CYAN}Server (Web Interface & Database)${NC}"
@@ -124,7 +110,7 @@ echo -e "  Method: ${CYAN}$([ "$SERVER_METHOD" = "1" ] && echo "Docker Compose" 
 echo -e "  Directory: ${CYAN}${INSTALL_DIR}${NC}"
 echo -e "  Estimated time: ${CYAN}10-15 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-#echo ""
+echo ""
 read -p "Proceed with server installation? (Y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
@@ -132,23 +118,19 @@ if [[ $REPLY =~ ^[Nn]$ ]]; then
     exit 0
 fi
 
-# Create temporary directory
 echo ""
 echo -e "${BLUE}Setting up installation environment...${NC}"
 mkdir -p "$TEMP_DIR"
 cd "$TEMP_DIR"
 
-# Check if git is installed
 if ! command -v git &> /dev/null; then
     echo -e "${YELLOW}Installing git...${NC}"
     apt-get update -qq
     apt-get install -y git
 fi
 
-# Download the project
 echo -e "${BLUE}Downloading ClassDojo Debit System...${NC}"
 
-# Clone the repository
 if [ -n "$REPO_URL" ]; then
     git clone "$REPO_URL" "$TEMP_DIR/things"
     if [ -d "$TEMP_DIR/things/$REPO_SUBDIR" ]; then
