@@ -156,12 +156,22 @@ if [ -d "./client" ]; then
     cp -r ./client/* ${CLIENT_DIR}/
     cd ${CLIENT_DIR}
 
+    # Set up Python virtual environment and install dependencies
+    if [ ! -d venv ]; then
+        python3 -m venv venv
+    fi
+    source venv/bin/activate
+    pip install --upgrade pip
+    if [ -f requirements.txt ]; then
+        pip install -r requirements.txt
+    fi
+    deactivate
+
     if [ -f "./install.sh" ]; then
         chmod +x ./install.sh
         bash ./install.sh
     else
-        echo -e "${RED}Error: client/install.sh not found${NC}"
-        exit 1
+        echo -e "${YELLOW}No additional client/install.sh found, continuing...${NC}"
     fi
 else
     echo -e "${RED}Error: client directory not found${NC}"

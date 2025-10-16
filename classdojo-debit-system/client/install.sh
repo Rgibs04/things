@@ -103,10 +103,16 @@ esac
 echo -e "${GREEN}✓ System dependencies installed${NC}"
 echo ""
 
-# Install Python dependencies
-echo -e "${BLUE}Installing Python dependencies...${NC}"
-pip3 install -r requirements.txt
-echo -e "${GREEN}✓ Python dependencies installed${NC}"
+# Install Python dependencies in a virtual environment (PEP 668 compliant)
+echo -e "${BLUE}Installing Python dependencies in a virtual environment...${NC}"
+if [ ! -d venv ]; then
+    python3 -m venv venv
+fi
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+deactivate
+echo -e "${GREEN}✓ Python dependencies installed in venv${NC}"
 echo ""
 
 # Create desktop shortcut (Linux)
@@ -120,7 +126,7 @@ Version=1.0
 Type=Application
 Name=ClassDojo Debit Kiosk
 Comment=ClassDojo Debit Card System Kiosk
-Exec=python3 $(pwd)/kiosk_app.py
+Exec=$(pwd)/venv/bin/python $(pwd)/kiosk_app.py
 Icon=$(pwd)/icon.png
 Path=$(pwd)
 Terminal=false
@@ -148,7 +154,7 @@ pkill -f kiosk_app.py || true
 sleep 2
 
 # Start kiosk
-exec python3 kiosk_app.py "$@"
+exec ./venv/bin/python kiosk_app.py "$@"
 EOF
 
 chmod +x "$STARTUP_SCRIPT"
