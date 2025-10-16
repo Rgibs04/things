@@ -128,9 +128,9 @@ echo -e "  Server: ${CYAN}$([ "$SERVER_IP" = "auto" ] && echo "Auto-discover" ||
 echo -e "  Directory: ${CYAN}${CLIENT_DIR}${NC}"
 echo -e "  Estimated time: ${CYAN}5-10 minutes${NC}"
 echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-echo ""
+#echo ""
 #read -p "Proceed with client installation? (Y/n) " -n 1 -r
-echo
+#echo
 if [[ $REPLY =~ ^[Nn]$ ]]; then
     echo -e "${YELLOW}Installation cancelled${NC}"
     exit 0
