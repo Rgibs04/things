@@ -118,9 +118,9 @@ echo ""
 # Create desktop shortcut (Linux)
 if [[ "$OS" == "linux" ]]; then
     echo -e "${BLUE}Creating desktop shortcut...${NC}"
-    if [ -d "$HOME/Desktop" ]; then
-        DESKTOP_FILE="$HOME/Desktop/classdojo-kiosk.desktop"
-        cat > "$DESKTOP_FILE" << EOF
+
+    DESKTOP_FILE="$HOME/Desktop/classdojo-kiosk.desktop"
+    cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -132,11 +132,9 @@ Path=$(pwd)
 Terminal=false
 StartupWMClass=kiosk-app
 EOF
-        chmod +x "$DESKTOP_FILE"
-        echo -e "${GREEN}✓ Desktop shortcut created${NC}"
-    else
-        echo -e "${YELLOW}No Desktop directory found for user $HOME. Skipping shortcut creation.${NC}"
-    fi
+
+    chmod +x "$DESKTOP_FILE"
+    echo -e "${GREEN}✓ Desktop shortcut created${NC}"
 fi
 
 # Create startup script
