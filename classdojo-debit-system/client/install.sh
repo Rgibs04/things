@@ -108,18 +108,18 @@ echo -e "${BLUE}Installing Python dependencies in a virtual environment...${NC}"
 if [ ! -d venv ]; then
     python3 -m venv venv
 fi
-#source venv/bin/activate
-#pip install --upgrade pip
-#pip install -r requirements.txt
-#deactivate
-#echo -e "${GREEN}✓ Python dependencies installed in venv${NC}"
-#echo ""
+source /home/kiosk/venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+deactivate
+echo -e "${GREEN}✓ Python dependencies installed in venv${NC}"
+echo ""
 
 # Create desktop shortcut (Linux)
 if [[ "$OS" == "linux" ]]; then
     echo -e "${BLUE}Creating desktop shortcut...${NC}"
 
-    DESKTOP_FILE="$HOME/Desktop/kiosk/classdojo-kiosk.desktop"
+    DESKTOP_FILE="$HOME/Desktop/classdojo-kiosk.desktop"
     cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
 Version=1.0
