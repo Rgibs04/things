@@ -156,16 +156,29 @@ if [ -d "./client" ]; then
     cp -r ./client/* ${CLIENT_DIR}/
     cd ${CLIENT_DIR}
 
-    # Set up Python virtual environment and install dependencies
-    if [ ! -d venv ]; then
-        python3 -m venv venv
-    fi
-    source venv/bin/activate
-    pip install --upgrade pip
-    if [ -f requirements.txt ]; then
-        pip install -r requirements.txt
-    fi
-    deactivate
+    #!/bin/bash
+# Installer script - setup Python virtual environment
+
+# Always create venv if it doesn't exist
+if [ ! -d venv ]; then
+    python3 -m venv venv
+fi
+
+# Activate the virtual environment
+# shellcheck disable=SC1091
+source venv/bin/activate
+
+# Upgrade pip inside venv
+pip install --upgrade pip
+
+# Install dependencies if requirements.txt exists
+if [ -f requirements.txt ]; then
+    pip install -r requirements.txt
+fi
+
+# Deactivate venv
+deactivate
+
 
     if [ -f "./install.sh" ]; then
         chmod +x ./install.sh
