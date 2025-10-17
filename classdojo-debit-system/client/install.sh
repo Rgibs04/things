@@ -119,7 +119,7 @@ fi
 if [[ "$OS" == "linux" ]]; then
     echo -e "${BLUE}Creating desktop shortcut...${NC}"
 
-    DESKTOP_FILE="$HOME/Desktop/classdojo-kiosk.desktop"
+    DESKTOP_FILE="$HOME/Desktop/kiosk/classdojo-kiosk.desktop"
     cat > "$DESKTOP_FILE" << EOF
 [Desktop Entry]
 Version=1.0
