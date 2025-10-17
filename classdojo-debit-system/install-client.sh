@@ -1,5 +1,9 @@
 #!/bin/bash
 
+import subprocess
+import sys
+import os
+
 set -e
 
 RED='\033[0;31m'
@@ -156,16 +160,23 @@ if [ -d "./client" ]; then
     cp -r ./client/* ${CLIENT_DIR}/
     cd ${CLIENT_DIR}
 
-    # Set up Python virtual environment and install dependencies
-    if [ ! -d venv ]; then
-        python3 -m venv venv
-    fi
-    source venv/bin/activate
-    pip install --upgrade pip
-    if [ -f requirements.txt ]; then
-        pip install -r requirements.txt
-    fi
-    deactivate
+    
+
+venv_dir = "venv"
+
+# Create venv if it doesn't exist
+if not os.path.isdir(venv_dir):
+    subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
+
+# Path to pip inside the venv
+pip_path = os.path.join(venv_dir, "bin", "pip")
+
+# Upgrade pip
+subprocess.run([pip_path, "install", "--upgrade", "pip"], check=True)
+
+# Install requirements if file exists
+if os.path.isfile("requirements.txt"):
+    subprocess.run([pip_path, "install", "-r", "requirements.txt"], check=True)
 
     if [ -f "./install.sh" ]; then
         chmod +x ./install.sh
