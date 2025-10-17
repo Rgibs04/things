@@ -239,4 +239,4 @@ echo -e "${YELLOW}Documentation:${NC}"
 echo -e "  Client Guide: ${CLIENT_DIR}/README.md"
 echo ""
 echo -e "${GREEN}Client is ready to connect to server!${NC}"
-echo ""
+echo
